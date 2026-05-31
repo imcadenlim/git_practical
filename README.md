@@ -18,6 +18,17 @@ The objective is to determine whether environmental sensor measurements can be u
 
 ---
 
+## Team Information
+
+**Project Type:** Individual Project
+
+**Student:**
+- Caden Lim
+
+All project components, including the EDA notebook, machine learning pipeline, documentation, and GitHub repository management, were completed independently.
+
+---
+
 ## Dataset
 
 The dataset is stored in SQLite database format:
@@ -28,12 +39,12 @@ data/gas_monitoring.db
 
 The dataset contains environmental measurements including:
 
-* Temperature
-* Humidity
-* CO2 sensor readings
-* Metal Oxide gas sensor readings
-* HVAC operation modes
-* Ambient light levels
+- Temperature
+- Humidity
+- CO2 sensor readings
+- Metal Oxide gas sensor readings
+- HVAC operation modes
+- Ambient light levels
 
 The target variable is:
 
@@ -43,24 +54,24 @@ Activity Level
 
 which contains activity categories such as:
 
-* Low Activity
-* Moderate Activity
-* High Activity
+- Low Activity
+- Moderate Activity
+- High Activity
 
 ---
 
 ## Key EDA Findings
 
-Several important observations were identified during exploratory data analysis:
+Several important observations were identified during exploratory data analysis.
 
 ### Missing Values
 
 Missing values were identified in multiple sensor variables, including:
 
-* Humidity
-* MetalOxideSensor_Unit2
-* CO_GasSensor
-* Ambient Light Level
+- Humidity
+- MetalOxideSensor_Unit2
+- CO_GasSensor
+- Ambient Light Level
 
 Median imputation was selected because it is robust to extreme values and preserves the overall distribution of sensor measurements.
 
@@ -91,13 +102,14 @@ Most sensor variables showed weak to moderate correlations, suggesting that mult
 
 The following preprocessing and feature engineering steps were applied:
 
-* Missing value imputation using median values
-* Standardization of inconsistent categorical labels
-* One-hot encoding of categorical variables
-* Label encoding of the target variable
-* Feature scaling using StandardScaler for Logistic Regression
+- Missing value imputation using median values
+- Standardization of inconsistent activity labels
+- Standardization of HVAC operation mode labels
+- One-hot encoding of categorical variables
+- Label encoding for XGBoost
+- Feature scaling using StandardScaler for Logistic Regression
 
-These steps were implemented to improve data quality and model performance.
+These transformations improve data quality and ensure compatibility with machine learning algorithms.
 
 ---
 
@@ -121,11 +133,11 @@ XGBoost was selected because of its strong predictive performance and ability to
 
 ## Evaluation Metrics
 
-Multiple evaluation metrics were used:
+Multiple evaluation metrics were used to evaluate model performance.
 
 ### Accuracy
 
-Measures overall prediction correctness.
+Measures the overall proportion of correct predictions.
 
 ### Precision
 
@@ -139,19 +151,25 @@ Measures how many actual labels are correctly identified.
 
 Provides a balanced measure between precision and recall.
 
-Because the dataset is imbalanced, F1-score, precision, and recall were considered alongside accuracy.
+### Confusion Matrix
+
+Provides detailed insight into classification performance for each activity class.
+
+Because the dataset is imbalanced, precision, recall, and F1-score were considered alongside accuracy.
 
 ---
 
 ## Model Performance Summary
 
-The models were evaluated using classification reports and performance metrics.
+The models were evaluated using classification reports and confusion matrices.
 
-Overall findings:
+| Model | Accuracy |
+|---------|---------|
+| Logistic Regression | 0.63 |
+| Random Forest | 0.69 |
+| XGBoost | 0.65 |
 
-* Random Forest achieved the strongest overall performance.
-* Logistic Regression provided a useful baseline model.
-* XGBoost produced competitive results but did not outperform Random Forest on this dataset.
+Random Forest achieved the strongest overall performance and was selected as the best-performing model.
 
 ---
 
@@ -159,10 +177,10 @@ Overall findings:
 
 Random Forest feature importance analysis indicated that:
 
-* MetalOxideSensor_Unit4
-* MetalOxideSensor_Unit3
-* CO2_ElectroChemicalSensor
-* MetalOxideSensor_Unit2
+- MetalOxideSensor_Unit4
+- MetalOxideSensor_Unit3
+- CO2_ElectroChemicalSensor
+- MetalOxideSensor_Unit2
 
 were among the most influential predictors of resident activity level.
 
@@ -186,31 +204,35 @@ EGT309PROJECT/
 │   └── pipeline.py
 │
 ├── saved_model/
-├── eda2.ipynb
+├── eda.ipynb
 ├── requirements.txt
+├── run.sh
 └── README.md
 ```
 
 ---
 
-## File Contributions
+## Contribution Summary
 
-Project implementation:
+This project was completed individually.
 
-| File              | Responsibility                  |
-| ----------------- | ------------------------------- |
-| data_ingestion.py | Load data from SQLite database  |
-| preprocessing.py  | Data cleaning and preprocessing |
-| train_model.py    | Model training                  |
-| evaluate_model.py | Model evaluation                |
-| pipeline.py       | Pipeline orchestration          |
-| eda2.ipynb        | Exploratory Data Analysis       |
+All files were authored and maintained by Rahmat.
+
+| File | Responsibility |
+|--------|--------|
+| data_ingestion.py | Load data from SQLite database |
+| preprocessing.py | Data cleaning and preprocessing |
+| train_model.py | Machine learning model training |
+| evaluate_model.py | Model evaluation and reporting |
+| pipeline.py | End-to-end pipeline orchestration |
+| eda.ipynb | Exploratory Data Analysis and findings |
+| README.md | Project documentation |
 
 ---
 
 ## Installation
 
-Install required packages:
+Install the required packages:
 
 ```bash
 pip install -r requirements.txt
@@ -232,24 +254,45 @@ Run the machine learning pipeline:
 python pipeline.py
 ```
 
+Alternatively, from the project root:
+
+```bash
+sh run.sh
+```
+
+---
+
+## Docker
+
+Docker was not used in this project.
+
+The machine learning pipeline can be executed directly using Python using the instructions provided above.
+
 ---
 
 ## Technologies Used
 
-* Python
-* Pandas
-* NumPy
-* Scikit-learn
-* XGBoost
-* Matplotlib
-* Seaborn
-* SQLite
-* Google Colab
-* VS Code
-* GitHub
+- Python
+- Pandas
+- NumPy
+- Scikit-learn
+- XGBoost
+- Matplotlib
+- Seaborn
+- SQLite
+- Jupyter Notebook
+- Google Colab
+- VS Code
+- GitHub
 
 ---
 
 ## Conclusion
 
-The project demonstrates that environmental sensor measurements can be used to predict resident activity levels. After comparing multiple machine learning algorithms, Random Forest achieved the strongest overall performance and provided useful insights into the most important environmental predictors of resident activity.
+This project demonstrated that environmental sensor measurements can be used to predict resident activity levels using machine learning techniques.
+
+Several data quality issues, including missing values and inconsistent labels, were identified and corrected during preprocessing. Multiple machine learning models were evaluated, with Random Forest achieving the strongest overall performance.
+
+Feature importance analysis revealed that gas sensor measurements were among the most influential predictors of activity level, highlighting the value of environmental sensing data for activity monitoring applications.
+
+Future improvements could include additional feature engineering, advanced class balancing techniques such as SMOTE, and further hyperparameter optimization to improve minority-class prediction performance.
