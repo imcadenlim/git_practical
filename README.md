@@ -131,6 +131,24 @@ XGBoost was selected because of its strong predictive performance and ability to
 
 ---
 
+## Hyperparameter Tuning
+
+To improve model performance, hyperparameter tuning was performed on the Random Forest model using RandomizedSearchCV.
+
+Parameters such as:
+
+- Number of trees (n_estimators)
+- Maximum tree depth (max_depth)
+- Minimum samples required for splitting
+
+were evaluated across multiple parameter combinations.
+
+RandomizedSearchCV was selected because it allows efficient exploration of the hyperparameter search space while requiring less computational time than an exhaustive Grid Search.
+
+The tuned Random Forest model was then compared against the baseline models to determine whether performance improvements could be achieved.
+
+---
+
 ## Evaluation Metrics
 
 Multiple evaluation metrics were used to evaluate model performance.
