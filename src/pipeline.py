@@ -1,3 +1,7 @@
+import os
+import joblib
+import config
+
 from data_ingestion import load_data
 
 from preprocessing import (
@@ -20,10 +24,24 @@ from evaluate_model import (
 )
 
 
+def save_model(model, filename):
+    """
+    Save a trained model to the saved_model directory.
+    """
+
+    os.makedirs(config.SAVED_MODEL_DIR, exist_ok=True)
+
+    filepath = os.path.join(config.SAVED_MODEL_DIR, filename)
+
+    joblib.dump(model, filepath)
+
+    print(f"Model saved to {filepath}")
+
+
 def main():
 
     # load dataset
-    dataframe = load_data("../data/gas_monitoring.db")
+    dataframe = load_data(config.DATABASE_PATH)
 
     # preprocessing
     dataframe = clean_activity_labels(dataframe)
@@ -60,6 +78,8 @@ def main():
     print("\nLogistic Regression Results")
     print(logistic_report)
 
+    save_model(logistic_model, "logistic_regression.pkl")
+
     # Random Forest
     rf_model = train_random_forest(
         X_train,
@@ -74,6 +94,8 @@ def main():
 
     print("\nRandom Forest Results")
     print(rf_report)
+
+    save_model(rf_model, "random_forest.pkl")
 
     # XGBoost
     xgb_model, label_encoder = train_xgboost(
@@ -90,6 +112,9 @@ def main():
 
     print("\nXGBoost Results")
     print(xgb_report)
+
+    save_model(xgb_model, "xgboost.pkl")
+    save_model(label_encoder, "label_encoder.pkl")
 
 
 if __name__ == "__main__":

@@ -67,6 +67,10 @@ def prepare_features(dataframe):
 
     y = dataframe["Activity Level"]
 
+    # Remove Session ID as it is an identifier, not a predictive feature
+    if "Session ID" in X.columns:
+        X = X.drop(columns=["Session ID"])
+
     X = pd.get_dummies(X, drop_first=True)
 
     return X, y
@@ -81,7 +85,8 @@ def split_and_scale(X, y):
         X,
         y,
         test_size=0.2,
-        random_state=42
+        random_state=42,
+        stratify=y
     )
 
     scaler = StandardScaler()

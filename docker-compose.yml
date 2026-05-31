@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  pipeline:
+    build: .
+    container_name: gas_monitoring_pipeline
+    environment:
+      - DATABASE_PATH=data/gas_monitoring.db
+      - SAVED_MODEL_DIR=saved_model
+    volumes:
+      # Mount data folder so the container can read the database
+      - ./data:/app/data
+      # Mount saved_model folder so trained models are saved to your machine
+      - ./saved_model:/app/saved_model

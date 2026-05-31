@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project analyzes environmental sensor data collected from elderly residents’ homes to predict resident activity levels using machine learning techniques.
+This project analyzes environmental sensor data collected from elderly residents' homes to predict resident activity levels using machine learning techniques.
 
 The project follows a complete machine learning workflow:
 
@@ -73,7 +73,7 @@ Missing values were identified in multiple sensor variables, including:
 - CO_GasSensor
 - Ambient Light Level
 
-Median imputation was selected because it is robust to extreme values and preserves the overall distribution of sensor measurements.
+Median imputation was selected for numerical variables because it is robust to extreme values and preserves the overall distribution of sensor measurements. Mode imputation was used for the categorical Ambient Light Level variable.
 
 ### Data Quality Issues
 
@@ -84,13 +84,17 @@ Moderate Activity
 ModerateActivity
 ```
 
-These labels were standardized during preprocessing to ensure consistent model training.
+These labels were standardized during preprocessing to ensure consistent model training. HVAC Operation Mode labels were also standardized to lowercase.
 
 ### Class Imbalance
 
 The dataset exhibited class imbalance, with Low Activity representing the majority class.
 
-This observation motivated the use of multiple evaluation metrics beyond simple accuracy.
+This observation motivated the use of multiple evaluation metrics beyond simple accuracy, including precision, recall, and F1-score.
+
+### Outlier Detection
+
+Unrealistic temperature readings above 100 degrees were identified, confirming the presence of contaminated or synthetic sensor data as described in the problem statement.
 
 ### Correlation Analysis
 
@@ -102,9 +106,11 @@ Most sensor variables showed weak to moderate correlations, suggesting that mult
 
 The following preprocessing and feature engineering steps were applied:
 
-- Missing value imputation using median values
+- Missing value imputation using median values for numerical features
+- Mode imputation for categorical features
 - Standardization of inconsistent activity labels
 - Standardization of HVAC operation mode labels
+- Removal of Session ID as it is an identifier, not a predictive feature
 - One-hot encoding of categorical variables
 - Label encoding for XGBoost
 - Feature scaling using StandardScaler for Logistic Regression
@@ -133,17 +139,15 @@ XGBoost was selected because of its strong predictive performance and ability to
 
 ## Hyperparameter Tuning
 
-To improve model performance, hyperparameter tuning was performed on the Random Forest model using RandomizedSearchCV.
+To improve model performance, hyperparameter tuning was performed on the Random Forest model using GridSearchCV.
 
 Parameters such as:
 
 - Number of trees (n_estimators)
 - Maximum tree depth (max_depth)
-- Minimum samples required for splitting
+- Minimum samples required for splitting (min_samples_split)
 
-were evaluated across multiple parameter combinations.
-
-RandomizedSearchCV was selected because it allows efficient exploration of the hyperparameter search space while requiring less computational time than an exhaustive Grid Search.
+were evaluated across multiple parameter combinations using 3-fold cross-validation scored on weighted F1-score.
 
 The tuned Random Forest model was then compared against the baseline models to determine whether performance improvements could be achieved.
 
@@ -183,9 +187,11 @@ The models were evaluated using classification reports and confusion matrices.
 
 | Model | Accuracy |
 |---------|---------|
-| Logistic Regression | 0.63 |
-| Random Forest | 0.69 |
-| XGBoost | 0.65 |
+| Logistic Regression | ~0.63 |
+| Random Forest | ~0.69 |
+| XGBoost | ~0.65 |
+| Balanced Random Forest | ~0.69 |
+| Tuned Random Forest (GridSearchCV) | ~0.69 |
 
 Random Forest achieved the strongest overall performance and was selected as the best-performing model.
 
@@ -219,9 +225,15 @@ EGT309PROJECT/
 │   ├── preprocessing.py
 │   ├── train_model.py
 │   ├── evaluate_model.py
-│   └── pipeline.py
+│   ├── pipeline.py
+│   └── config.py
 │
 ├── saved_model/
+│   ├── logistic_regression.pkl
+│   ├── random_forest.pkl
+│   ├── xgboost.pkl
+│   └── label_encoder.pkl
+│
 ├── eda.ipynb
 ├── requirements.txt
 ├── run.sh
@@ -234,7 +246,7 @@ EGT309PROJECT/
 
 This project was completed individually.
 
-All files were authored and maintained by Rahmat.
+All files were authored and maintained by Caden Lim.
 
 | File | Responsibility |
 |--------|--------|
@@ -243,6 +255,7 @@ All files were authored and maintained by Rahmat.
 | train_model.py | Machine learning model training |
 | evaluate_model.py | Model evaluation and reporting |
 | pipeline.py | End-to-end pipeline orchestration |
+| config.py | Centralised configuration settings |
 | eda.ipynb | Exploratory Data Analysis and findings |
 | README.md | Project documentation |
 
@@ -282,9 +295,39 @@ sh run.sh
 
 ## Docker
 
-Docker was not used in this project.
+Docker is used to containerize and run the machine learning pipeline in a consistent environment.
 
-The machine learning pipeline can be executed directly using Python using the instructions provided above.
+### Prerequisites
+
+Make sure Docker Desktop is installed and running on your machine. Download it from [https://www.docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop).
+
+### Build and Run with Docker Compose
+
+From the project root directory, run:
+
+```bash
+docker-compose up --build
+```
+
+This will:
+1. Build the Docker image using Python 3.12
+2. Install all required dependencies from `requirements.txt`
+3. Run the full ML pipeline inside the container
+4. Save trained models to your local `saved_model/` folder
+
+### Run Again Without Rebuilding
+
+Once built, you can run it again without rebuilding using:
+
+```bash
+docker-compose up
+```
+
+### Stop the Container
+
+```bash
+docker-compose down
+```
 
 ---
 
@@ -298,6 +341,7 @@ The machine learning pipeline can be executed directly using Python using the in
 - Matplotlib
 - Seaborn
 - SQLite
+- Joblib
 - Jupyter Notebook
 - Google Colab
 - VS Code
@@ -309,7 +353,7 @@ The machine learning pipeline can be executed directly using Python using the in
 
 This project demonstrated that environmental sensor measurements can be used to predict resident activity levels using machine learning techniques.
 
-Several data quality issues, including missing values and inconsistent labels, were identified and corrected during preprocessing. Multiple machine learning models were evaluated, with Random Forest achieving the strongest overall performance.
+Several data quality issues, including missing values, inconsistent labels, and unrealistic sensor readings, were identified and corrected during preprocessing. Multiple machine learning models were evaluated, with Random Forest achieving the strongest overall performance.
 
 Feature importance analysis revealed that gas sensor measurements were among the most influential predictors of activity level, highlighting the value of environmental sensing data for activity monitoring applications.
 
